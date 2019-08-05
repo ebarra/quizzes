@@ -1,0 +1,23 @@
+{
+  "name": "quizzes",
+  "version": "1.0.0",
+  "description": "Project Quizzes in Node.js. Created to learn about database management with Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ebarra/quizzes.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ebarra/quizzes/issues"
+  },
+  "homepage": "https://github.com/ebarra/quizzes#readme",
+  "dependencies": {
+    "sequelize": "^5.12.3",
+    "sqlite3": "^4.0.9"
+  }
+}
