@@ -111,10 +111,9 @@ function read_user(name){
 * Functions that updates a user from the database with the given name
 */
 function update_user(name, new_name, new_age){
-
   person.update( {name: new_name, age: Number(new_age)}, {where: {name: name}})
   .then( n => {
-    if (n[0]!==0) { console.log(`  ${name} updated to ${age}`) }
+    if (n[0]!==0) { console.log(`  ${name} updated to ${new_name} with ${new_age} age`) }
     else { throw new Error(`  ${name} not in DB`) };
   })
   .catch( err => console.log(`  ${err}`));
