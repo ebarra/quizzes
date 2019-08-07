@@ -1,5 +1,5 @@
 const sequelize = require("./model.js");
-const person = sequelize.models.person;
+const user = sequelize.models.user;
 
 
 process.argv.slice(2).forEach(function (val, index, array) {
@@ -53,11 +53,11 @@ switch (process.argv[2]) {
 */
 function init(){
   sequelize.sync()
-  .then(() => person.count())
+  .then(() => user.count())
   .then((count) => {
     if (count===0) {
       return (
-        person.bulkCreate([
+        user.bulkCreate([
           { name: 'Peter', age: 22},
           { name: 'Anna', age: 23},
           { name: 'John', age: 30}
@@ -75,7 +75,7 @@ function init(){
 * Functions that lists all the users in the database
 */
 function list_users(){
-  person.findAll()
+  user.findAll()
   .then( people =>
     people.forEach( p => console.log(`  ${p.name} is ${p.age} years old`))
   )
@@ -86,7 +86,7 @@ function list_users(){
 * Functions that creates a user in the database with the given data
 */
 function create_user(name, age){
-  person.create({ name, age })
+  user.create({ name, age })
   .then(() =>
     console.log(`   ${name} created with ${age} years`)
   )
@@ -98,10 +98,10 @@ function create_user(name, age){
 * Functions that reads a user from the database with the given name
 */
 function read_user(name){
-  person.findOne( {where: {name}})
-  .then( person => {
-    if (!person) {throw new Error(`  '${name}' is not in DB`)};
-    console.log(`  ${person.name} is ${person.age} years old`);
+  user.findOne( {where: {name}})
+  .then( user => {
+    if (!user) {throw new Error(`  '${name}' is not in DB`)};
+    console.log(`  ${user.name} is ${user.age} years old`);
   })
   .catch( err => console.log(`  '${err}`));
 }
@@ -111,7 +111,7 @@ function read_user(name){
 * Functions that updates a user from the database with the given name
 */
 function update_user(name, new_name, new_age){
-  person.update( {name: new_name, age: Number(new_age)}, {where: {name: name}})
+  user.update( {name: new_name, age: Number(new_age)}, {where: {name: name}})
   .then( n => {
     if (n[0]!==0) { console.log(`  ${name} updated to ${new_name} with ${new_age} age`) }
     else { throw new Error(`  ${name} not in DB`) };
@@ -124,7 +124,7 @@ function update_user(name, new_name, new_age){
 * Functions that deletes a user from the database with the given name
 */
 function delete_user(name){
-  person.destroy( {where: {name} })
+  user.destroy( {where: {name} })
   .then( n => {
     if (n!==0) {
       console.log(`  ${name} deleted from DB`)

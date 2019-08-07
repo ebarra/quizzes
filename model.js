@@ -4,8 +4,8 @@ const Sequelize = require('sequelize');
 const options = { logging: false};
 const sequelize = new Sequelize("sqlite:db.sqlite", options);
 
-sequelize.define(
-  'person',
+const user = sequelize.define(
+  'user',
   { name: { 
       type: Sequelize.STRING,
       unique: { msg: "Name already exists"},
@@ -22,5 +22,19 @@ sequelize.define(
     }
   }
 );
+
+
+const quiz = sequelize.define(
+  'quiz',
+  { question: { 
+      type: Sequelize.STRING,
+      unique: { msg: "Quiz already exists"}
+    },
+    answer: Sequelize.STRING
+  }
+);
+
+quiz.belongsTo(user, {as: 'author', foreignKey: 'authorId'});
+user.hasMany(quiz, {as: 'posts', foreignKey: 'authorId'});
 
 module.exports = sequelize;
