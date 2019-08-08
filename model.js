@@ -37,4 +37,8 @@ const quiz = sequelize.define(
 quiz.belongsTo(user, {as: 'author', foreignKey: 'authorId'});
 user.hasMany(quiz, {as: 'posts', foreignKey: 'authorId'});
 
+user.belongsToMany(quiz, {as: 'favouriteQuizzes', foreignKey: 'userId', through: 'favourites'});
+quiz.belongsToMany(user, {as: 'fans', foreignKey: 'quizId',  through: 'favourites'});
+
+
 module.exports = sequelize;

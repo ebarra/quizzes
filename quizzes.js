@@ -1,6 +1,7 @@
 const sequelize = require("./model.js");
 const user = sequelize.models.user;
 const quiz = sequelize.models.quiz;
+const favourites = sequelize.models.favourites;
 
 process.argv.slice(2).forEach(function (val, index, array) {
   console.log(index + ': ' + val);
@@ -84,6 +85,20 @@ switch (process.argv[2]) {
         delete_user_quizzes(process.argv[3]);
       }
       break;
+  case 'mark_fav':
+      if(process.argv.length!==5){
+        console.log("Usage: node quizzes.js mark_fav name question");
+      } else {
+        mark_fav(process.argv[3], process.argv[4]);
+      }
+      break;
+  case 'favourites':
+      if(process.argv.length!==4){
+        console.log("Usage: node quizzes.js favourites name");
+      } else {
+        get_favourites(process.argv[3]); //we don't use favourites for the function name as it has already been declare when importing the model
+      }
+      break;
   default:
       console.log('Sorry, that is not something I know how to do.');
 }
@@ -107,8 +122,15 @@ async function init(){
         { question: 'Capital of France', answer: 'Paris', authorId: 1},
         { question: 'Capital of Italy', answer: 'Rome', authorId: 2},
         { question: 'Capital of Russia', answer: 'Moscow', authorId: 3}
-      ])
-      console.log(`  DB created with ${c.length} users and ${q.length} quizzes.`);
+      ]);
+      let f = await favourites.bulkCreate([
+        { userId: 1, quizId: 3},
+        { userId: 2, quizId: 4},
+        { userId: 2, quizId: 1},
+        { userId: 2, quizId: 2},
+        { userId: 3, quizId: 2}
+      ]);
+      console.log(`  DB created with ${c.length} users and ${q.length} quizzes and ${f.length} favourites.`);
       return;
     } else {
       console.log(`  DB exists & has ${count} elems`);
@@ -329,6 +351,52 @@ async function delete_user_quizzes(name){
     });
     await u.destroy();
     console.log(` ${name} and his/her quizzes deleted from db`);
+  } catch (err) {
+    console.log(`  ${err}`);
+  }
+}
+
+
+/*
+* Functions that marks a quiz as favourite
+*/
+async function mark_fav(name, question){
+  try {
+    let u = await user.findOne({where: {name}});
+    if (!u) { throw new Error(`  ${name} not in DB`)};
+    let q = await quiz.findOne({ where: {question}});
+    if (!q) { throw new Error(`  ${question} not in DB`)};
+    let mark = favourites.build({userId: u.id});
+    mark.quizId = q.id;
+    await mark.save({ fields: ["userId", "quizId"]});
+    console.log(`  '${question}' marked by ${name}`);    
+  } catch (err) {
+    console.log(`  ${err}`);
+  }
+}
+
+
+/*
+* Functions that shows user favourites
+*/
+async function get_favourites(name){
+  try {
+    let u = await user.findOne({ 
+      where: {name}, 
+      include: [{
+        model: quiz, 
+        as: 'favouriteQuizzes',
+        include: [{
+          model: user,
+          as: 'author'
+        }]
+      }]
+    });
+    if (!u) { throw new Error(`  ${name} not in DB`)};
+    console.log(`  ${name}'s favourites`);
+    u.favouriteQuizzes.forEach( q =>
+      console.log(`    ${q.question} -> ${q.answer} (${q.author.name})`)
+    );   
   } catch (err) {
     console.log(`  ${err}`);
   }
