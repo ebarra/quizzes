@@ -6,16 +6,19 @@ module.exports = {
     return queryInterface.bulkInsert('users', [
       {
         name: 'Peter',
+        age: 22,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         name: 'Anna',
+        age: 23,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         name: 'John',
+        age: 30,
         createdAt: new Date(),
         updatedAt: new Date()
       }

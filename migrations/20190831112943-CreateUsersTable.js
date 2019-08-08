@@ -15,6 +15,10 @@ module.exports = {
           type: Sequelize.STRING,
           unique: true
         },
+        age: { 
+          type: Sequelize.INTEGER,
+          unique: true
+        },
         createdAt: {
           type: Sequelize.DATE,
           allowNull: false
