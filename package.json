@@ -4,7 +4,8 @@
   "description": "Project Quizzes in Node.js. Created to learn about database management with Node.js",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "migrate": "./node_modules/.bin/sequelize db:migrate --url sqlite://$(pwd)/db.sqlite",
+    "seed": "./node_modules/.bin/sequelize db:seed:all --url sqlite://$(pwd)/db.sqlite"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,7 @@
   "homepage": "https://github.com/ebarra/quizzes#readme",
   "dependencies": {
     "sequelize": "^5.12.3",
+    "sequelize-cli": "^5.5.0",
     "sqlite3": "^4.0.9"
   }
 }
