@@ -42,6 +42,13 @@ switch (process.argv[2]) {
         read_user(process.argv[3]);
       }
       break;
+  case 'read_user_quizzes':
+      if(process.argv.length!==4){
+        console.log("Usage: node quizzes.js read_user name");
+      } else {
+        read_user_quizzes(process.argv[3]);
+      }
+      break;
   case 'update_user':
       if(process.argv.length!==6){
         console.log("Usage: node quizzes.js update_user name new_name new_age");
@@ -54,6 +61,27 @@ switch (process.argv[2]) {
         console.log("Usage: node quizzes.js delete_user name");
       } else {
         delete_user(process.argv[3]);
+      }
+      break;
+  case 'update_quiz':
+      if(process.argv.length!==6){
+        console.log("Usage: node quizzes.js update_quiz question new_question new_answer");
+      } else {
+        update_quiz(process.argv[3], process.argv[4], process.argv[5]);
+      }
+      break;
+  case 'delete_quiz':
+      if(process.argv.length!==4){
+        console.log("Usage: node quizzes.js delete_quiz question");
+      } else {
+        delete_quiz(process.argv[3]);
+      }
+      break;
+  case 'delete_user_quizzes':
+      if(process.argv.length!==4){
+        console.log("Usage: node quizzes.js delete_user_quizzes name");
+      } else {
+        delete_user_quizzes(process.argv[3]);
       }
       break;
   default:
@@ -188,6 +216,25 @@ async function read_user(name){
   }
 }
 
+/*
+* Functions that reads a user from the database with the given name and prints his/her quizzes
+*/
+async function read_user_quizzes(name){
+  try {
+    let person = await user.findOne( {where: {name},
+      include: [{
+        model: quiz,
+        as: 'posts'
+      }]
+    })
+    if (!person) {throw new Error(`  '${name}' is not in DB`)};
+    person.posts.forEach( q =>
+      console.log(`    ${q.question} -> ${q.answer}`)
+    );
+  } catch (err) {
+    console.log(`  ${err}`);
+  }
+}
 
 /*
 * Functions that updates a user from the database with the given name
@@ -215,6 +262,73 @@ async function delete_user(name){
     else {
       throw new Error(`  ${name} not in DB`)
     };
+  } catch (err) {
+    console.log(`  ${err}`);
+  }
+}
+
+
+/*
+* Functions that updates a quiz from the database with the given content
+*/
+async function update_quiz(question, new_question, new_answer){
+  try{
+    let n = await quiz.update( {question: new_question, answer: new_answer}, {where: {question: question}})
+    if (n[0]!==0) { console.log(`  new_quiz: ${new_question} -> ${new_answer}`); }
+    else { throw new Error(`  ${question} not in DB`) };
+  } catch (err) {
+    console.log(`  ${err}`);
+  }
+}
+
+
+/*
+* Functions that deletes a quiz from the database with the given question
+*/
+async function delete_quiz(question){
+  try {
+    let n = quiz.destroy( {where: {question} })
+    if (n!==0) {
+      console.log(`  ${question} deleted from DB`)
+    }
+    else {
+      throw new Error(`  ${question} not in DB`)
+    };
+  } catch (err) {
+    console.log(`  ${err}`);
+  }
+}
+
+
+/*
+* Functions that deletes a quiz from the database with the given question
+*/
+async function delete_quiz(question){
+  try {
+    let n = await quiz.destroy( {where: {question} })
+    if (n!==0) {
+      console.log(`  ${question} deleted from DB`)
+    }
+    else {
+      throw new Error(`  ${question} not in DB`)
+    };
+  } catch (err) {
+    console.log(`  ${err}`);
+  }
+}
+
+/*
+* Functions that deletes a user from the database and his/her quizzes
+*/
+async function delete_user_quizzes(name){
+  try {
+    let u = await user.findOne( {where: {name}});
+    if (!u) { throw new Error(`${name} not in DB`)};
+    await quiz.destroy({
+      where: {authorId: u.id}
+    });
+    await u.destroy();
+    console.log(` ${name} and his/her quizzes deleted from db`);
   } catch (err) {
     console.log(`  ${err}`);
   }
