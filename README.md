@@ -15,7 +15,14 @@ $ node quizzes.js init
 $ node quizzes.js list_users
 $ node quizzes.js create_user Enrique 37
 $ node quizzes.js delete_user Enrique
-$ node quizzes.js update_user Enrique Henry 38
-$ node quizzes.js read_user Enrique
+$ node quizzes.js update_user John Juan 38
+$ node quizzes.js read_user Juan
+$ node quizzes.js list_quizzes_users
+$ node quizzes.js list_users_quizzes
+$ node quizzes.js create_user_quiz Peter 'Capital of Portugal' 'Lisboa'
+$ node quizzes.js read_user_quizzes Peter
+$ node quizzes.js update_quiz 'Capital of Portugal' 'Capital of Chile' 'Santiago'
+$ node quizzes.js delete_quiz 'Capital of Spain'
+$ node quizzes.js delete_user_quizzes Anna
 $
 ```

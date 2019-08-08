@@ -45,7 +45,7 @@ switch (process.argv[2]) {
       break;
   case 'read_user_quizzes':
       if(process.argv.length!==4){
-        console.log("Usage: node quizzes.js read_user name");
+        console.log("Usage: node quizzes.js read_user_quizzes name");
       } else {
         read_user_quizzes(process.argv[3]);
       }
@@ -274,6 +274,8 @@ async function update_user(name, new_name, new_age){
 
 /*
 * Functions that deletes a user from the database with the given name
+* should not be used after adding quizzes, as this method does not deletes the related quizzes
+* use delete_user_quizzes instead
 */
 async function delete_user(name){
   try {
@@ -310,24 +312,6 @@ async function update_quiz(question, new_question, new_answer){
 async function delete_quiz(question){
   try {
     let n = quiz.destroy( {where: {question} })
-    if (n!==0) {
-      console.log(`  ${question} deleted from DB`)
-    }
-    else {
-      throw new Error(`  ${question} not in DB`)
-    };
-  } catch (err) {
-    console.log(`  ${err}`);
-  }
-}
-
-
-/*
-* Functions that deletes a quiz from the database with the given question
-*/
-async function delete_quiz(question){
-  try {
-    let n = await quiz.destroy( {where: {question} })
     if (n!==0) {
       console.log(`  ${question} deleted from DB`)
     }
