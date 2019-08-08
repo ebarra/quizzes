@@ -1,6 +1,6 @@
 const sequelize = require("./model.js");
 const user = sequelize.models.user;
-
+const quiz = sequelize.models.quiz;
 
 process.argv.slice(2).forEach(function (val, index, array) {
   console.log(index + ': ' + val);
@@ -15,11 +15,24 @@ switch (process.argv[2]) {
   case 'list_users':
       list_users();
       break;
+  case 'list_quizzes_users':
+      list_quizzes_users();
+      break;
+  case 'list_users_quizzes':
+      list_users_quizzes();
+      break;
   case 'create_user':
       if(process.argv.length!==5){
         console.log("Usage: node quizzes.js create_user name age");
       } else {
         create_user(process.argv[3], process.argv[4]);
+      }
+      break;
+  case 'create_user_quiz':
+      if(process.argv.length!==6){
+        console.log("Usage: node quizzes.js create_user_quiz name question answer");
+      } else {
+        create_user_quiz(process.argv[3], process.argv[4], process.argv[5]);
       }
       break;
   case 'read_user':
@@ -61,7 +74,13 @@ async function init(){
         { name: 'Anna', age: 23},
         { name: 'John', age: 30}
       ]);
-      console.log(`  DB created with ${c.length} elems`);
+      let q = await quiz.bulkCreate([
+        { question: 'Capital of Spain', answer: 'Madrid', authorId: 1},
+        { question: 'Capital of France', answer: 'Paris', authorId: 1},
+        { question: 'Capital of Italy', answer: 'Rome', authorId: 2},
+        { question: 'Capital of Russia', answer: 'Moscow', authorId: 3}
+      ])
+      console.log(`  DB created with ${c.length} users and ${q.length} quizzes.`);
       return;
     } else {
       console.log(`  DB exists & has ${count} elems`);
@@ -84,12 +103,72 @@ async function list_users(){
 }
 
 /*
+* Functions that lists all the quizzes in the database with their authors
+*/
+async function list_quizzes_users(){
+  try{
+    let quizzes = await quiz.findAll({
+          include: [{
+            model: user,
+            as: 'author'
+          }]
+        });
+    quizzes.forEach( q => console.log(`  ${q.question} -> ${q.answer} (${q.author.name})`));
+  } catch (err) {
+    console.log(`  ${err}`);
+  }
+}
+
+/*
+* Functions that lists all the users in the database with their quizzes
+*/
+async function list_users_quizzes(){
+  try{
+    let users = await user.findAll({
+          include: [{
+            model: quiz,
+            as: 'posts'
+          }]
+        });
+    users.forEach( user => {
+       console.log(`  ${user.name}'s quizzes`);
+       user.posts.forEach( q =>
+         console.log(`    ${q.question} -> ${q.answer}`)
+       )
+    });
+  } catch (err) {
+    console.log(`  ${err}`);
+  }
+}
+
+
+/*
 * Functions that creates a user in the database with the given data
 */
 async function create_user(name, age){
   try {
     await user.create({ name, age });
     console.log(`   ${name} created with ${age} years`);
+  } catch (err) {
+    console.log(`  ${err}`);
+  }
+}
+
+/*
+* Functions that creates a quiz for a user in the database with the given data
+*/
+async function create_user_quiz(name, question, answer){
+  try {
+    let u = await user.findOrCreate(
+      {where: {name}}
+    );
+    let q = await quiz.create(
+        { question: question,
+          answer: answer,
+          authorId: u[0].id
+        }
+      );
+    console.log(`   User ${name} created with quiz: ${question} -> ${answer}`);
   } catch (err) {
     console.log(`  ${err}`);
   }
